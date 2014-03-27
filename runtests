@@ -1,0 +1,22 @@
+#!/bin/bash
+set -eo pipefail
+
+export TESTS="$1"
+export SOLUTIONS="$2"
+
+function exec_tests() {
+    SOLUTION=`pwd`/$1
+    PUZZLE=$(basename $SOLUTION)
+    TESTFILE=$TESTS/$PUZZLE/tests.sh
+    [ ! -f $TESTFILE ] && {
+        echo "skipping $PUZZLE - no matching test suite"
+        return
+    }
+    pushd $TESTS/$PUZZLE > /dev/null
+    ./tests.sh $SOLUTION
+    popd  > /dev/null
+}
+
+for FILE in $(find $SOLUTIONS -maxdepth 1 -type f); do
+    exec_tests $FILE
+done
